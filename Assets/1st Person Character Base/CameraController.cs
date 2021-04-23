@@ -8,6 +8,9 @@ public class CameraController : MonoBehaviour
     public float sensitivity;
     public Transform playerBody;
 
+    public bool left = false;
+    public bool right = false;
+
     [SerializeField]
     private InputActionReference cameraControl;
 
@@ -46,18 +49,39 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!PauseMenuController.GameIsPaused)
+        {
+            Vector2 camera = cameraControl.action.ReadValue<Vector2>();
 
-        Vector2 camera = cameraControl.action.ReadValue<Vector2>();
+            mouse.x = camera.x * sensitivity;
+            mouse.y = camera.y * sensitivity;
 
-        mouse.x = camera.x * sensitivity;
-        mouse.y = camera.y * sensitivity;
+            // Look up and down
 
-        // Look up and down
-        XAxisRotation -= mouse.y;
-        XAxisRotation = Mathf.Clamp(XAxisRotation, -90.0f, 90.0f);
-        transform.localRotation = Quaternion.Euler(XAxisRotation, 0.0f, 0.0f);
+            if (!right)
+            {
+                XAxisRotation -= mouse.y;
+            }
+            else
+            {
+                XAxisRotation -= -mouse.y;
+            }
 
-        // Look left and right and rotate around the Y Axis
-        playerBody.Rotate(Vector3.up * mouse.x);
+
+
+            XAxisRotation = Mathf.Clamp(XAxisRotation, -90.0f, 90.0f);
+            transform.localRotation = Quaternion.Euler(XAxisRotation, 0.0f, 0.0f);
+
+            // Look left and right and rotate around the Y Axis
+            if (!left)
+            {
+                playerBody.Rotate(Vector3.up * mouse.x);
+            }
+            else
+            {
+                playerBody.Rotate(Vector3.up * -mouse.x);
+
+            }
+        }
     }
 }

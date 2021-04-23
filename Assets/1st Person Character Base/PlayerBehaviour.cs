@@ -58,33 +58,39 @@ public class PlayerBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundRadius, groundMask);
 
-        if (isGrounded && velocity.y < 0)
+        if (!PauseMenuController.GameIsPaused)
         {
-            velocity.y = -2.0f;
+
+
+            isGrounded = Physics.CheckSphere(groundCheck.position, groundRadius, groundMask);
+
+            if (isGrounded && velocity.y < 0)
+            {
+                velocity.y = -2.0f;
+            }
+
+            // movement
+
+            Vector2 movement = movementControl.action.ReadValue<Vector2>();
+
+            float x = movement.x;
+            float z = movement.y;
+
+            Vector3 move = transform.right * x + transform.forward * z;
+
+            controller.Move(move * maxSpeed * Time.deltaTime);
+
+            // jumping
+            if (jumpControl.action.triggered && isGrounded)
+            {
+                velocity.y = Mathf.Sqrt(jumpHeight * -2.0f * gravity);
+            }
+
+            // gravity
+            velocity.y += gravity * Time.deltaTime;
+            controller.Move(velocity * Time.deltaTime);
         }
-
-        // movement
-
-        Vector2 movement = movementControl.action.ReadValue<Vector2>();
-
-        float x = movement.x;
-        float z = movement.y;
-
-        Vector3 move = transform.right * x + transform.forward * z;
-
-        controller.Move(move * maxSpeed * Time.deltaTime);
-
-        // jumping
-        if (jumpControl.action.triggered && isGrounded)
-        {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2.0f * gravity);
-        }
-
-        // gravity
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
     }
 
     void OnDrawGizmos()
